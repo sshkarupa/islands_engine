@@ -33,7 +33,7 @@ defmodule IslandsEngine.IslandTest do
       assert Island.new(:wrong, coordinate) == {:error, :invalid_island_type}
     end
 
-    test "invalid start coordinate", %{coordinate: coordinate} = _context do
+    test "invalid start coordinate" do
       {:ok, coordinate} = Coordinate.new(10, 10)
       assert Island.new(:square, coordinate) == {:error, :invalid_coordinate}
     end
