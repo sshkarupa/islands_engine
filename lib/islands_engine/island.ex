@@ -7,10 +7,14 @@ defmodule IslandsEngine.Island do
   def new(type, %Coordinate{} = upper_left) do
     with [_|_] = offsets <- offsets(type),
          %MapSet{} = coordinates <- add_coordinates(offsets, upper_left) do
-    %Island{coordinates: coordinates, hit_coordinates: MapSet.new()}
+      {:ok, %Island{coordinates: coordinates, hit_coordinates: MapSet.new()}}
     else
       error -> error
     end
+  end
+
+  def overlap?(existing_island, new_island) do
+    not MapSet.disjoint?(existing_island.coordinates, new_island.coordinates)
   end
 
   defp add_coordinates(offsets, upper_left) do
