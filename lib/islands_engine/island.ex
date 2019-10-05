@@ -49,4 +49,6 @@ defmodule IslandsEngine.Island do
   def forested?(%Island{} = island) do
     MapSet.equal?(island.coordinates, island.hit_coordinates)
   end
+
+  def types(), do: [:square, :atoll, :dot, :l_shape, :s_shape]
 end
