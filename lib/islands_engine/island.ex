@@ -4,6 +4,9 @@ defmodule IslandsEngine.Island do
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
 
+  @doc """
+  Creates a new island
+  """
   def new(type, %Coordinate{} = upper_left) do
     with [_|_] = offsets <- offsets(type),
          %MapSet{} = coordinates <- add_coordinates(offsets, upper_left) do
@@ -33,10 +36,16 @@ defmodule IslandsEngine.Island do
   defp offsets(:s_shape), do: [{0, 1}, {0, 2}, {1, 0}, {1, 1}]
   defp offsets(_), do: {:error, :invalid_island_type}
 
+  @doc """
+  Checks if islands overlap each other
+  """
   def overlap?(existing_island, new_island) do
     not MapSet.disjoint?(existing_island.coordinates, new_island.coordinates)
   end
 
+  @doc """
+  Guesses an island's coordinates
+  """
   def guess(%Island{} = island, %Coordinate{} = coordinate) do
     case MapSet.member?(island.coordinates, coordinate) do
       true ->
@@ -46,6 +55,9 @@ defmodule IslandsEngine.Island do
     end
   end
 
+  @doc """
+  Checks if an island is forested
+  """
   def forested?(%Island{} = island) do
     MapSet.equal?(island.coordinates, island.hit_coordinates)
   end
