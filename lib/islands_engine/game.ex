@@ -15,7 +15,11 @@ defmodule IslandsEngine.Game do
   def add_player(game, name) when is_binary(name), do: GenServer.call(game, {:add_player, name})
 
   def position_island(game, player, key, row, col) when player in @players do
-    GenEvent.call(game, {:position_island, player, key, row, col})
+    GenServer.call(game, {:position_island, player, key, row, col})
+  end
+
+  def set_islands(game, player) when player in @players do
+    GenServer.call(game, {:set_islands, player})
   end
 
   def handle_call({:add_player, name}, _from, state) do
@@ -32,7 +36,7 @@ defmodule IslandsEngine.Game do
 
   def handle_call({:position_island, player, key, row, col}, _from, state) do
     board = player_board(state, player)
-    with {:ok, rules} <- Rules.check(state.rules, {:position_island, player}),
+    with {:ok, rules} <- Rules.check(state.rules, {:position_islands, player}),
          {:ok, coordinate} <- Coordinate.new(row, col),
          {:ok, island} <- Island.new(key, coordinate),
          %{} = board <- Board.position_island(board, key, island)
@@ -48,6 +52,22 @@ defmodule IslandsEngine.Game do
         {:reply, {:error, :invalid_coordinate}, state}
       {:error, :invalid_island_type} ->
         {:reply, {:error, :invalid_island_type}, state}
+    end
+  end
+
+  def handle_call({:set_islands, player}, _from, state) do
+    board = player_board(state, player)
+    with {:ok, rules} <- Rules.check(state.rules, {:set_islands, player}),
+         true <- Board.all_islands_positioned?(board)
+    do
+      state
+      |> update_rules(rules)
+      |> reply_success({:ok, board})
+    else
+      :error ->
+        {:reply, :error, state}
+      false ->
+        {:reply, {:error, :not_all_islands_positioned}, state}
     end
   end
 
