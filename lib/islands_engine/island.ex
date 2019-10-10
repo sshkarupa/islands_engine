@@ -1,4 +1,6 @@
 defmodule IslandsEngine.Island do
+  @moduledoc false
+
   alias IslandsEngine.{Coordinate, Island}
 
   @enforce_keys [:coordinates, :hit_coordinates]

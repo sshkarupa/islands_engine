@@ -1,5 +1,7 @@
 
 defmodule IslandsEngine.Coordinate do
+  @moduledoc false
+
   alias __MODULE__
 
   @enforce_keys [:row, :col]
