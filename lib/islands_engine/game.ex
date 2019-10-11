@@ -2,35 +2,33 @@ defmodule IslandsEngine.Game do
   @moduledoc false
 
   use GenServer, start: {__MODULE__, :start_link, []}, restart: :transient
+
   alias IslandsEngine.{Board, Coordinate, Guesses, Island, Rules}
 
   @players [:player1, :plyaer2]
-  @timeout 60 * 60 * 24 * 1000
+  @timeout 60 * 60 * 1000
 
-  def start_link(name) when is_binary(name), do: GenServer.start_link(__MODULE__, name, name: via_tuple(name))
+  def start_link(name) when is_binary(name), do:
+    GenServer.start_link(__MODULE__, name, name: via_tuple(name))
 
   def via_tuple(name), do: {:via, Registry, {Registry.Game, name}}
+
+  def add_player(game, name) when is_binary(name), do:
+    GenServer.call(game, {:add_player, name})
+
+  def position_island(game, player, key, row, col) when player in @players, do:
+    GenServer.call(game, {:position_island, player, key, row, col})
+
+  def set_islands(game, player) when player in @players, do:
+    GenServer.call(game, {:set_islands, player})
+
+  def guess_coordinate(game, player, row, col) when player in @players, do:
+    GenServer.call(game, {:guess_coordinate, player, row, col})
 
   def init(name) do
     player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
     player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
     {:ok, %{player1: player1, player2: player2, rules: %Rules{}}, @timeout}
-  end
-
-  def add_player(game, name) when is_binary(name) do
-    GenServer.call(game, {:add_player, name})
-  end
-
-  def position_island(game, player, key, row, col) when player in @players do
-    GenServer.call(game, {:position_island, player, key, row, col})
-  end
-
-  def set_islands(game, player) when player in @players do
-    GenServer.call(game, {:set_islands, player})
-  end
-
-  def guess_coordinate(game, player, row, col) when player in @players do
-    GenServer.call(game, {:guess_coordinate, player, row, col})
   end
 
   def handle_call({:add_player, name}, _from, state) do
@@ -103,19 +101,18 @@ defmodule IslandsEngine.Game do
     end
   end
 
-  def handle_info(:timeout, state) do
+  def handle_info(:timeout, state)i, do:
     {:stop, {:shutdown, :timeout}, state}
-  end
 
-  defp update_player2_name(state, name), do: put_in(state.player2.name, name)
+  defp update_player2_name(state, name), do:
+    put_in(state.player2.name, name)
 
-  defp update_board(state, player, board) do
+  defp update_board(state, player, board), do
     Map.update!(state, player, fn player -> %{player | board: board} end)
-  end
 
   defp update_rules(state, rules), do: %{state | rules: rules}
 
-  defp reply(state, reply), do: {:replay, reply, state, @timeout}
+  defp reply(state, reply), do: {:reply, reply, state, @timeout}
 
   defp player_board(state, player), do: Map.get(state, player).board
 
