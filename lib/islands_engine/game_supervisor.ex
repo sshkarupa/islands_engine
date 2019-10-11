@@ -4,17 +4,19 @@ defmodule IslandsEngine.GameSupervisor do
   use DynamicSupervisor
   alias IslandsEngine.Game
 
-  def start_link(_opts) do
+  def start_link(_opts), do:
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+
+  def start_game(name) do
+    spec = %{id: Game, start: {Game, :start_link, [name]}}
+    DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
-  def start_game(name), do: DynamicSupervisor.start_child(__MODULE__, [name])
+  def stop_game(name), do:
+    DynamicSupervisor.terminate_child(__MODULE__, pid_from_name(name))
 
-  def stop_game(name), do: DynamicSupervisor.terminate_child(__MODULE__, pid_from_name(name))
-
-  def init(:ok) do
-    DynamicSupervisor.init([Game], strategy: :one_for_one)
-  end
+  def init(:ok), do:
+    DynamicSupervisor.init(strategy: :one_for_one)
 
   defp pid_from_name(name) do
     name
