@@ -26,10 +26,29 @@ defmodule IslandsEngine.Game do
     GenServer.call(game, {:guess_coordinate, player, row, col})
 
   def init(name) do
+    send(self(), {:set_state, name})
+    {:ok, fresh_state(name)}
+  end
+
+  defp fresh_state(name) do
     player1 = %{name: name, board: Board.new(), guesses: Guesses.new()}
     player2 = %{name: nil, board: Board.new(), guesses: Guesses.new()}
-    {:ok, %{player1: player1, player2: player2, rules: %Rules{}}, @timeout}
+    %{player1: player1, player2: player2, rules: %Rules{}}
   end
+
+  def handle_info({:set_state, name}, _state) do
+    state =
+      case :ets.lookup(:game_state, name) do
+        [] -> fresh_state(name)
+        [{_key, state_data}] -> state_data
+      end
+
+    :ets.insert(:game_state, {name, state})
+    {:noreply, state, @timeout}
+  end
+
+  def handle_info(:timeout, state), do:
+    {:stop, {:shutdown, :timeout}, state}
 
   def handle_call({:add_player, name}, _from, state) do
     with {:ok, rules} <- Rules.check(state.rules, :add_player)
@@ -101,18 +120,24 @@ defmodule IslandsEngine.Game do
     end
   end
 
-  def handle_info(:timeout, state)i, do:
-    {:stop, {:shutdown, :timeout}, state}
+  def terminate({:shutdown, :timeout}, state) do
+    :ets.delete(:game_state, state.player1.name)
+  end
+
+  def terminate(_reason, _state), do: :ok
 
   defp update_player2_name(state, name), do:
     put_in(state.player2.name, name)
 
-  defp update_board(state, player, board), do
+  defp update_board(state, player, board), do:
     Map.update!(state, player, fn player -> %{player | board: board} end)
 
   defp update_rules(state, rules), do: %{state | rules: rules}
 
-  defp reply(state, reply), do: {:reply, reply, state, @timeout}
+  defp reply(state, reply) do
+    :ets.insert(:game_state, {state.player1.name, state})
+    {:reply, reply, state, @timeout}
+  end
 
   defp player_board(state, player), do: Map.get(state, player).board
 
