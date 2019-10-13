@@ -1,8 +1,18 @@
 # IslandsEngine
 
-**TODO: Add description**
+Engine for the "Islands" game.
 
 ## Installation
+
+Add `islands_engine` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:islands_engine, path: "../islands_engine"}
+  ]
+end
+```
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `islands_engine` to your list of dependencies in `mix.exs`:
@@ -15,7 +25,6 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/islands_engine](https://hexdocs.pm/islands_engine).
+## Web Interface
 
+The web interface for the "Islands" game can be found [here](https://github.com/sshkarupa/islands_interface).
