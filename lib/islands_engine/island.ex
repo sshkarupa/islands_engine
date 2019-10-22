@@ -6,11 +6,13 @@ defmodule IslandsEngine.Island do
   @enforce_keys [:coordinates, :hit_coordinates]
   defstruct [:coordinates, :hit_coordinates]
 
+  @island_types [:atoll, :dot, :l_shape, :s_shape, :square]
+
   @doc """
   Creates a new island
   """
   def new(type, %Coordinate{} = upper_left) do
-    with [_|_] = offsets <- offsets(type),
+    with [_ | _] = offsets <- offsets(type),
          %MapSet{} = coordinates <- add_coordinates(offsets, upper_left) do
       {:ok, %Island{coordinates: coordinates, hit_coordinates: MapSet.new()}}
     else
@@ -19,14 +21,14 @@ defmodule IslandsEngine.Island do
   end
 
   defp add_coordinates(offsets, upper_left) do
-    Enum.reduce_while(offsets, MapSet.new(), fn(offset, acc) ->
+    Enum.reduce_while(offsets, MapSet.new(), fn offset, acc ->
       add_coordinate(acc, upper_left, offset)
     end)
   end
 
   defp add_coordinate(coordinates, %Coordinate{row: row, col: col}, {row_offset, col_offset}) do
     case Coordinate.new(row + row_offset, col + col_offset) do
-      {:ok, coordinate} ->             {:cont, MapSet.put(coordinates, coordinate)}
+      {:ok, coordinate} -> {:cont, MapSet.put(coordinates, coordinate)}
       {:error, :invalid_coordinate} -> {:halt, {:error, :invalid_coordinate}}
     end
   end
@@ -53,7 +55,9 @@ defmodule IslandsEngine.Island do
       true ->
         hit_coordinates = MapSet.put(island.hit_coordinates, coordinate)
         {:hit, %{island | hit_coordinates: hit_coordinates}}
-      false -> :miss
+
+      false ->
+        :miss
     end
   end
 
@@ -64,5 +68,5 @@ defmodule IslandsEngine.Island do
     MapSet.equal?(island.coordinates, island.hit_coordinates)
   end
 
-  def types(), do: [:square, :atoll, :dot, :l_shape, :s_shape]
+  def types(), do: @island_types
 end

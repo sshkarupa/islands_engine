@@ -17,12 +17,20 @@ defmodule IslandsEngine.GuessesTest do
   describe "Guesses.add/3" do
     test "adds a coordinate to :hit coordinates", %{coordinate: coordinate} = _context do
       guesses = Guesses.new()
-      assert Guesses.add(guesses, :hit, coordinate) == %Guesses{hits: MapSet.new([coordinate]), misses: MapSet.new()}
+
+      assert Guesses.add(guesses, :hit, coordinate) == %Guesses{
+               hits: MapSet.new([coordinate]),
+               misses: MapSet.new()
+             }
     end
 
     test "adds a coordinate to :miss coordinates", %{coordinate: coordinate} = _context do
       guesses = Guesses.new()
-      assert Guesses.add(guesses, :miss, coordinate) == %Guesses{hits: MapSet.new(), misses: MapSet.new([coordinate])}
+
+      assert Guesses.add(guesses, :miss, coordinate) == %Guesses{
+               hits: MapSet.new(),
+               misses: MapSet.new([coordinate])
+             }
     end
   end
 end
