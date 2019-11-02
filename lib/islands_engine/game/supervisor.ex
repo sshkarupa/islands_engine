@@ -1,4 +1,4 @@
-defmodule IslandsEngine.GameSupervisor do
+defmodule IslandsEngine.Game.Supervisor do
   @moduledoc """
   A supervisor that starts `Game` processes dynamically.
   """

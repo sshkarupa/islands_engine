@@ -6,7 +6,7 @@ defmodule IslandsEngine do
 
     children = [
       {Registry, keys: :unique, name: IslandsEngine.GameRegistry},
-      IslandsEngine.GameSupervisor
+      IslandsEngine.Game.Supervisor
     ]
 
     opts = [strategy: :one_for_one, name: IslandsEngine.Supervisor]
