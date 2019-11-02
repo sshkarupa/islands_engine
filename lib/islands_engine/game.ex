@@ -30,11 +30,7 @@ defmodule IslandsEngine.Game do
   Returns the `pid` of the game process registered under the given `game_name`,
   or `nil` if no process is registered.
   """
-  def pid_from_name(name) do
-    name
-    |> Game.via_tuple()
-    |> GenServer.whereis()
-  end
+  def pid_from_name(name), do: name |> via_tuple() |> GenServer.whereis()
 
   def add_player(game, player, name) when is_binary(name) and player in @players,
     do: GenServer.call(game, {:add_player, player, name})
@@ -157,7 +153,7 @@ defmodule IslandsEngine.Game do
   defp update_rules(state, rules), do: %{state | rules: rules}
 
   defp reply(state, reply) do
-    :ets.insert(:game_state, {state.player1.name, state})
+    :ets.insert(:game_state, {game_name(), state})
     {:reply, reply, state, @timeout}
   end
 
