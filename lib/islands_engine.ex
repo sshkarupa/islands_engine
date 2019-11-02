@@ -1,18 +1,15 @@
 defmodule IslandsEngine do
-  @moduledoc """
-  Documentation for IslandsEngine.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    :ets.new(:game_state, [:public, :named_table])
 
-  ## Examples
+    children = [
+      {Registry, keys: :unique, name: IslandsEngine.GameRegistry},
+      IslandsEngine.GameSupervisor
+    ]
 
-      iex> IslandsEngine.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: IslandsEngine.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end
