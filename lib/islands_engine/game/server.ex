@@ -117,7 +117,7 @@ defmodule IslandsEngine.Game.Server do
   defp update_rules(state, rules), do: %{state | rules: rules}
 
   defp reply(state, reply) do
-    :ets.insert(:game_state, {state.player1.name, state})
+    :ets.insert(:game_state, {game_name(), state})
     {:reply, reply, state, @timeout}
   end
 

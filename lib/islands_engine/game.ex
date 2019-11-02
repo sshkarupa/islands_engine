@@ -1,6 +1,3 @@
-# TODO: Move implementations and callbacks into separate modules Game.Impl and Game.Server
-# Keep in this module only public API calls
-
 defmodule IslandsEngine.Game do
   @moduledoc """
   Public API for a game process that holds a state of the game.
