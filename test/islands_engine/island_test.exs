@@ -28,7 +28,7 @@ defmodule IslandsEngine.IslandTest do
       assert {:ok, %IslandsEngine.Island{}} = Island.new(:s_shape, coordinate)
     end
 
-    test "invalid island type", %{coordinate: coordinate} = _context do
+    test "invalid island type" do
       {:ok, coordinate} = Coordinate.new(1, 1)
       assert Island.new(:wrong, coordinate) == {:error, :invalid_island_type}
     end
